@@ -1,0 +1,10 @@
+Setting up environment
+
+1)install pip .
+2)create virtualenv,and activate it.
+3)install django.
+4)install mysqldb.
+5) run commmand python manage.py makemigrations
+6) run command python manage.py migrate .
+7) run command python manage.py runserver.
+8) then go to browser and use url localhost:8080/events

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    .nav-wrapper
+    {
+      background : #536dfe; 
+    }
+    #event_title{
+      font-size: 20px;
+      width:100%;
+    }
+    </style>
+    <meta charset="utf-8" />
+    <title>Ticket Pages</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.6.2/remarkable.min.js"></script>
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+  </head>
+  <body>
+    <nav>
+      <div class = "nav-wrapper" >
+        <a href="#" class="brand-logo center">Ticket Page</a>
+      </div>
+    </nav>
+    <div id="content"></div>
+    <script type="text/babel">
+
+    var Ticketfetch = React.createClass({
+      getInitialState : function(){
+        return {data1 : [], title : '' , start_date:'',last_date : ''};
+      },
+      componentDidMount: function(){
+        var url = '/events/fetch_tickets/' + this.props.event_id;
+        $.ajax({
+          url : url,
+          type  : 'GET',
+          dataType : 'json',
+          success : function(data){
+            console.log(data);
+            this.setState({data1 : data});
+          }.bind(this),
+          error : function(xhr, status, err){
+            alert('inside error');
+          }.bind(this)
+        });
+      },
+      handleTitle : function(e){
+        this.setState({title : e.target.value});
+      },
+      handlestartDate : function(e){
+        this.setState({start_date : e.target.value})
+       },
+      handleendDate : function(e){
+        this.setState({last_date : e.target.value})
+      },
+      handleSubmit : function(e){
+        e.preventDefault();
+        var tickets = this.state.data1;
+        var url = "/events/add_ticket/" + this.props.event_id;
+        $.ajax({
+          url  : url,
+          type : "POST",
+          data : {ticket_title:this.state.title,start_date:this.state.start_date,last_date:this.state.last_date},
+          success : function(data){
+            console.log(data);
+            tickets.push({event_title:data.event_title,ticket_title : data.ticket_title,start_date: data.start_date,ticket_id:data.ticket_id,last_date:data.last_date});
+            this.setState({data1 : tickets});
+           }.bind(this), 
+          error: function(data) {
+            alert(data.responseJSON.message);
+          }.bind(this),
+      });
+      },
+      handleFocus : function(event){
+        event.target.type = "date";
+      },
+      handleBlur:function(event){
+        event.target.type = "text";
+      },
+      render : function(){ 
+      return (
+        <div>
+         <Ticketlist data1 = {this.state.data1} /> 
+         <div className = "row">
+         <div className = "col s6" >
+         <form method = "POST">
+          <fieldset>
+           <legend> Ticket Forms </legend>
+             <div className="input-field row">
+               <label for ="title">Title</label>
+               <input type = "text" name ="event_title" onChange = {this.handleTitle} 
+                  value = {this.state.title} id = "title" className = "validate" /><br />
+             </div>
+             <div className="input-field row">
+               <input type = "text" onFocus = {this.handleFocus} name ="start_date" 
+                  onChange = {this.handlestartDate} placeholder="start date" 
+                  onBlur={this.handleBlur} value = {this.state.start_date} id = "date" className = "validate" />
+                  <br />
+             </div>
+             <div className="input-field row">
+               <input type = "text" name ="end_date" onChange = {this.handleendDate} onFocus = {this.handleFocus} 
+                  onBlur={this.handleBlur} placeholder = "last date" value = {this.state.last_date} id = "date" className = "validate" />
+                  <br />
+             </div>
+            <button className="btn waves-effect red col s12" type="submit" onClick = {this.handleSubmit}>Add Ticket
+              </button> <br /><br />
+         </fieldset>
+        </form>
+        </div>
+        </div>
+
+        </div>
+
+        );
+    }
+    });
+
+    var Ticketlist = React.createClass({
+      render : function(){
+          var tickets;
+          var ticket_list = [];
+          var len = this.props.data1.length;
+          for(var i = 0 ; i < len ; i++ )
+           {
+             tickets = this.props.data1[i];
+             ticket_list.push(
+                      <div key = {tickets.ticket_id}>
+                         <Tickets ticket_id = {tickets.ticket_id} ticket_title = {tickets.ticket_title} 
+                            event_title={tickets.event_title}  start_date = {tickets.start_date} 
+                            last_date = {tickets.last_date} index={i} /><br />
+                      </div>
+                      );
+           }
+          return (
+            <div>
+              {ticket_list}
+            </div>
+           );
+          }
+      }); 
+
+    var Tickets = React.createClass({
+      render : function(){
+        var start_date = new Date(this.props.start_date);
+        start_date = start_date.toDateString();
+        var last_date = new Date(this.props.last_date);
+        last_date = last_date.toDateString();
+        return (
+          <div>
+            <div className="row">
+              <div className="col s12 m6 l6">
+                <div className = "card">
+                  <div className="card blue-grey darken-1">
+                    <div className="card-content white-text">
+                      <span className="card-title">Ticket for {this.props.event_title} Event</span><br/>
+                      <span id="event_title"> {this.props.index + 1}  {this.props.ticket_title} </span>
+                      <br />
+                      Tickets Available from : <span id="event_date"> {start_date} </span>
+                      <br />
+                      Last day to buy Ticket : <span id="event_date"> {last_date} </span>
+                      <br />
+                    </div>
+                  </div>    
+                </div>
+              </div>
+            </div>
+          </div>
+          );
+      }
+    });
+
+
+    ReactDOM.render(<Ticketfetch event_id="{{event_id}}" /> , document.getElementById('content'));
+
+  </script>
+</body>
+</html>

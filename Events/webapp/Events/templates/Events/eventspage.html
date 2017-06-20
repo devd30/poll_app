@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    .nav-wrapper
+    {
+      background : #536dfe; 
+    }
+    #event_title{
+      font-size: 20px;
+      width:100%;
+    }
+    </style>
+    <meta charset="utf-8" />
+    <title>Event Pages</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.6.2/remarkable.min.js"></script>
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+  </head>
+  <body>
+    <nav>
+      <div class = "nav-wrapper" >
+        <a href="#" class="brand-logo center">Event Page</a>
+      </div>
+    </nav>
+    <div id="content"></div>
+    <script type="text/babel">
+
+    var Eventfetch = React.createClass({
+      getInitialState : function(){
+        return {data1 : [], title : '' , date:''};
+      },
+      componentDidMount: function(){
+          $.ajax({
+          url : '/events/fetchEvents/',
+          type  : 'GET',
+          dataType : 'json',
+          success : function(data){
+            this.setState({data1 : data});
+          }.bind(this),
+          error : function(xhr, status, err){
+            alert('inside error');
+          }.bind(this)
+        });
+
+      },
+      handleTitle : function(e){
+        this.setState({title : e.target.value});
+      },
+      handleDate : function(e){
+        var id = e.target.id;
+        this.setState({date : e.target.value})
+       },
+      handleSubmit : function(e){
+        e.preventDefault();
+        var events = this.state.data1;
+        $.ajax({
+          url  : "/events/addevent/",
+          type : "POST",
+          data : {event_title : this.state.title ,event_date:this.state.date},
+          success : function(data){
+            console.log(data);
+            events.push({event_title : data.event_title,event_date: data.event_date,event_id:data.event_id});
+            this.setState({data1 : events});
+           }.bind(this), 
+          error: function(xhr, status, err) {
+            alert('Invalid Date');
+          }.bind(this),
+      });
+      },
+      handleFocus : function(event){
+        event.target.type = "date";
+      },
+      handleBlur : function(event){
+        event.target.type = "text";
+      },
+      render : function(){ 
+      return (
+        <div>
+         <Eventlist data1 = {this.state.data1} />
+         <div className = "row">
+         <div className = "col s6" >
+         <form method = "POST">
+          <fieldset>
+           <legend> Event Forms </legend>
+             <div className="input-field row">
+               <label for ="title">Title</label>
+               <input type = "text" name ="event_title" onChange = {this.handleTitle} 
+                  value = {this.state.title} id = "title" className = "validate" /><br />
+             </div>
+             <div className="input-field row">
+               <input type = "text" name ="event_date" onChange = {this.handleDate} onFocus={this.handleFocus}
+                  onBlur = {this.handleBlur} placeholder = "event date" value = {this.state.date} id = "date" className = "validate" /><br />
+             </div>
+            <button className="btn waves-effect red col s12" type="submit" onClick = {this.handleSubmit}>Add Event
+              </button> <br /><br />
+         </fieldset>
+        </form>
+        </div>
+        </div>
+
+        </div>
+
+        );
+    }
+    });
+
+    var Eventlist = React.createClass({
+      render : function(){
+          var events;
+          var event_list = [];
+          var len = this.props.data1.length;
+          for(var i = 0 ; i < len ; i++ )
+           {
+             events = this.props.data1[i];
+             event_list.push(
+                      <div key = {events.event_id}>
+                         <Events event_id = {events.event_id} event_title = {events.event_title} 
+                              event_date = {events.event_date} /><br />
+                      </div>
+                      );
+           }
+          return (
+            <div>
+              {event_list}
+            </div>
+           );
+          }
+      }); 
+
+    var Events = React.createClass({
+      handleSubmit : function(event){
+        event.preventDefault();
+        window.location.href = "/events/tickets/" + event.target.id;        
+      },
+      render : function(){
+        var event_date = new Date(this.props.event_date);
+        event_date = event_date.toDateString();
+        return (
+          <div>
+            <div className="row">
+              <div className="col s12 m6 l6">
+                <div className = "card">
+                  <div className="card blue-grey darken-1">
+                    <div className="card-content white-text">
+                      <span className="card-title">Event</span><br/>
+                      <span id="event_title"> {this.props.event_id}  {this.props.event_title} </span>
+                      <br />
+                      Starts from <span id="event_date"> {event_date} </span>
+                      <br />
+                    </div>
+                    <div className = "card-action">
+                        <button type ="submit" onClick = {this.handleSubmit} id={this.props.event_id}
+                          className="btn waves-effect blue col s12">Add tickets for this event</button> 
+                          <br /><br />
+                    </div>
+                  </div>    
+                </div>
+              </div>
+            </div>
+          </div>
+          );
+      }
+    });
+
+
+    ReactDOM.render(<Eventfetch /> , document.getElementById('content'));
+
+  </script>
+</body>
+</html>

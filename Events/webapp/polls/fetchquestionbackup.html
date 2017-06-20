@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>React Tutorial</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.6.2/remarkable.min.js"></script>
+  </head>
+  <body>
+    <div id="content"></div>
+    <script type="text/babel">
+
+    var questionfetch = React.createClass({
+      getInitialState : function(){
+        return {data : []};
+      },
+      componentDidMount: function(){
+        $.ajax({
+          url : '/polls/fetchQuestion/',
+          type  : 'GET',
+          dataType : 'json'
+          success : function(data){
+            this.setState({data : data});
+          }.bind(this),
+          error : function(xhr, status, err){
+            alert('WE ARE IN ERROR MESSAGE');
+          }.bind(this)
+        });
+
+      },
+
+    render : function(){
+      return (
+        <div>
+         <questionlist data = this.state.data/>
+        </div>
+
+        );
+    }
+    });
+
+    var questionlist = React.createClass({
+      render : function(){
+        var question = this.props.data.map(function(questions){
+          return <question ques_id = {questions.question_id} ques_text = {questions.question_text} /> 
+        });
+        return (
+          <div>
+            {question}
+          </div>
+          );
+      }
+
+    }); 
+
+    var question = React.createClass({
+      render : function(){
+        return (
+          <span> {this.props.ques_id} </span> {this.props.ques_text}
+          );
+      }
+    });

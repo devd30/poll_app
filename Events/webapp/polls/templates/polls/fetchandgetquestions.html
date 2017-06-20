@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>React Tutorial</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.6.2/remarkable.min.js"></script>
+  </head>
+  <body>
+    <div id="content"></div>
+    <script type="text/babel">
+
+    var Questionfetch = React.createClass({
+      getInitialState : function(){
+        return {data1 : [],question : '' , choice1 : '' , choice2 : '' , choice3 : ''};
+      },
+      componentDidMount: function(){
+        $.ajax({
+          url : '/polls/fetchQuestion/',
+          type  : 'GET',
+          dataType : 'json',
+          success : function(data){
+            this.setState({data1 : data});
+          }.bind(this),
+          error : function(xhr, status, err){
+            alert('inside error');
+          }.bind(this)
+        });
+
+      },
+      handleQuestion : function(e){
+        this.setState({question : e.target.value})
+      },
+      handleChoice1 : function(e){
+        this.setState({choice1 : e.target.value});
+      },
+      handleChoice2 : function(e)
+      {
+        this.setState({choice2 : e.target.value});
+      },
+      handleChoice3 : function(e)
+      {
+        this.setState({choice3 : e.target.value});
+      },
+      handleSubmit : function(e){
+        e.preventDefault();
+        var ques = this.state.data1;
+        $.ajax({
+          url  : "/polls/questionaddreact/",
+          type : "POST",
+          data : {question : this.state.question , choice1 : this.state.choice1 , choice2 : this.state.choice2 
+            , choice3 : this.state.choice3},
+          success : function(data){
+            alert('hey');
+            ques.push({q_id : data.q_id  ,question_text : data.question_text , choices : data.choices});
+            this.setState({data1 : ques});
+           }.bind(this), 
+          error: function(xhr, status, err) {
+            alert('this is error');
+            console.error(this.props.url, status, err.toString());
+          }.bind(this),
+      });
+      },
+    render : function(){ 
+      return (
+        <div>
+         <Questionlist data1 = {this.state.data1} />
+        <form>
+         <fieldset>
+          <legend> Question Forms </legend>
+            <input type = "text" name ="question" value = {this.state.question} placeholder = "Enter your question here" 
+                                      onChange = {this.handleQuestion} /><br />
+            <input type = "text" name = "choice1" value = {this.state.choice1} placeholder = "choice1" 
+                                      onChange = {this.handleChoice1} /><br />
+            <input type = "text" name = "choice2" value = {this.state.choice2} placeholder = "choice2" 
+                                      onChange = {this.handleChoice2} /><br />
+            <input type = "text" name = "choice3" value = {this.state.choice3} placeholder = "choice3" 
+                                      onChange = {this.handleChoice3} /><br />
+            <input type ="submit" value ="submit" onClick = {this.handleSubmit} />
+         </fieldset>
+        </form>
+
+        </div>
+
+        );
+    }
+    });
+
+    var Questionlist = React.createClass({
+      render : function(){
+        var question = this.props.data1.map(function(questions){
+          return (
+            <div key = {questions.q_id}>
+              <Questions ques_id = {questions.q_id} ques_text = {questions.question_text} ques={questions} /><br />
+            </div>
+            );
+        });
+        return (
+          <div>
+            {question}
+          </div>
+          );
+      }
+
+    }); 
+
+    var Questions = React.createClass({
+      getInitialState : function(){
+        return {ques_id : '' , choice_id : ''};
+      },
+      handleRadio : function(e){
+        this.setState({choice_id : e.target.value , ques_id : e.target.name});
+      },
+      handleSubmit : function(e){
+         e.preventDefault();
+         $.ajax({
+           url : '/polls/' + this.state.ques_id +'/vote/',
+           type : 'POST',
+           data : {choice : this.state.choice_id},
+           success : function(data){
+             alert('data fetched');
+           }.bind(this),
+           error : function(e){
+            alert('this is error msg');
+           }.bind(this)
+         });
+      },
+      render : function(){
+        var choices = this.props.ques.choices.map(function(choice){
+          return ( 
+            <div key = {choice.choice_id}>
+              <span><input type = "radio" value = {choice.choice_id} name = {choice.ques_id} onClick ={this.handleRadio} />
+              </span> {choice.choice_text}
+            </div>
+            );
+        }.bind(this));
+        return (
+          <div>
+            <span> {this.props.ques_id} </span> {this.props.ques_text}
+            {choices}
+            <br />
+            <button type ="submit" onClick = {this.handleSubmit} >submit</button>
+          </div>
+          );
+      }
+    });
+
+
+
+    ReactDOM.render(<Questionfetch /> , document.getElementById('content'));
+
+  </script>
+</body>
+</html>

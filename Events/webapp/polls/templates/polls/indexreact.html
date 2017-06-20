@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>React Tutorial</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.6.2/remarkable.min.js"></script>
+  </head>
+  <body>
+    loading ...
+    <div id="content"></div>
+    <script type="text/babel">
+
+     var App = React.createClass({
+      getInitialState : function(){
+        return {url : '' };
+      },
+       componentDidMount: function(){
+        $.ajax({
+          url : '/polls/image/',
+          datatype:'json',
+          type : 'GET',
+          success : function(data){
+            var c = Math.floor(Math.random() * 1000);
+            console.log(c%2);
+            if(c%2 > 0)
+             {
+               this.setState({url : data.data[0].url });
+             }
+            else 
+               this.setState({url : data.data[1].url});
+           }.bind(this),
+
+           error: function(xhr, status, err) {
+            alert('this is true');
+            console.error(this.props.url, status, err.toString());
+            }.bind(this)
+           });
+       },
+           
+      render : function(){
+        return (
+          <div>
+            <ImageComponent url = {this.state.url} />
+          </div>
+          );
+        }
+      });
+
+     var ImageComponent = React.createClass({
+      render :  function(){
+        return (
+            <img src = {this.props.url}></img>
+          );
+      }
+     });
+
+  ReactDOM.render( <App /> , document.getElementById('content'));
+  </script>
+</body>
+</html>

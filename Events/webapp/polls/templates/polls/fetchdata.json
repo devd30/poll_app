@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1388534400000,
+        "text": "Hey there!",
+        "author": "Pete Hunt"
+    },
+    {
+        "id": 1420070400000,
+        "text": "React is *great*!",
+        "author": "Paul O\u2019Shannessy"
+    },
+    {
+        "id": 1466768846854,
+        "text": "hello",
+        "author": "hey"
+    },
+    {
+        "id": 1466768846856,
+        "text": "hello",
+        "author": "hello"
+    },
+    {
+        "id": 1466768846756,
+        "text": "hello",
+        "author": "bye"
+    },
+    {
+        "id": 1466768846769,
+        "text": "ello",
+        "author": "bye"
+    }
+]

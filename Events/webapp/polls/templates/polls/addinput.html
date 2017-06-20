@@ -1,0 +1,45 @@
+var React = require('react');
+
+module.exports = React.createClass({
+    addInputField: function(e) {
+        e.preventDefault();
+
+        var inputs = this.state.inputs;
+        inputs.push({name: null});
+        this.setState({inputs : inputs});
+    },
+    removeInputField: function(index) {
+        var inputs = this.state.inputs;
+        inputs.splice(index, 1);
+        this.setState({inputs : inputs});
+    },
+    handleSubmit: function (e) {
+        e.preventDefault();
+        // What do I do here?
+    },
+    getInitialState: function() {
+        return {inputs : []};
+    },
+    render: function (){
+        var inputs = this.state.inputs;
+        return (
+            // Setting up the form
+            // Blah blah
+           <div className="form-group">
+               <label className="col-sm-3 control-label">Dynamic Inputs</label>
+               <div className="col-sm-4">
+                   {inputs.map(function (input, index) {
+                       var ref = "input_" + index;
+                       return (
+                           <div className="input-group">
+                                <input type="text" className="form-control margin-bottom-12px" placeholder="Enter guid" value={input.name} ref={ref} aria-describedby={ref} />
+                                <span className="input-group-addon" onClick={this.removeInputField.bind(this, index)} id={ref} ><i className="fa fa-times"></i></span>
+                           </div>
+                       )
+                   }.bind(this))}
+                    <button className="btn btn-success btn-block" onClick={this.addInputField}>Add Input</button>
+               </div>
+           </div>
+        );
+    }
+});

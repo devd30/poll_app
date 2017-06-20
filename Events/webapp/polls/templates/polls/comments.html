@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>React Tutorial</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.1.0/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.6.2/remarkable.min.js"></script>
+  </head>
+  <body>
+    <div id="content"></div>
+    <script type="text/babel">
+    var CommentControl = React.createClass({
+      
+      getInitialState : function(){
+        return {author : '' , msg : '' , comments :[]};
+      },
+      
+      onChangeMsg : function(e){
+        this.setState({msg : e.target.value});
+      },
+
+      onChangeAuthor : function(e){
+        this.setState({author : e.target.value});
+      },
+
+      submitComments : function(e){
+        e.preventDefault();
+        var _comments = this.state.comments
+        $.ajax({
+          url: '/polls/comment/',
+          type: 'POST',
+          data: {author : this.state.author , msg : this.state.msg},
+          success: function(data) {
+            alert(data);
+            
+            _comments.push({msg:data.comment, author:data.author}); /*_comments.push({"msg":data.comment, "author":data.author}); */
+            this.setState({comments: _comments});
+          }.bind(this),
+          error: function(xhr, status, err) {
+            alert('this is true');
+            console.error(this.props.url, status, err.toString());
+          }.bind(this)
+        }); 
+         
+      /*this.setState({author : '' , msg : '' , comments : _comments});*/ 
+      },
+      render : function(){
+        return (
+           <div>
+             <form id = "formid" >
+             {{ form.non_field_errors }}
+             <table>
+              <tr>
+              <td>
+                <label> Name : </label>
+              </td>
+              <td>
+
+               {{ form.author.errors }}
+
+              <input id = "author" type ="text" value = {this.state.author} placeholder = "Your name" onChange = {this.onChangeAuthor}
+               name = "author"/>
+               </td>
+             </tr>
+             <tr>
+             <td>
+              <label> Comment : </label>
+             </td>
+             <td>
+             {{ form.msg.errors }}
+              <input id = "msg" type = "text" value = {this.state.msg} placeholder = "say something" onChange ={this.onChangeMsg} 
+              name ="msg"/>
+             </td>
+             </tr>
+               <input type = "submit" value = "submit" onClick={this.submitComments} />
+               </table>
+             </form>
+            <CommentCollection comments = {this.state.comments} />
+            </div>
+          );
+          
+      }
+    });
+
+    var CommentCollection = React.createClass({
+      render : function(){
+        var comment = this.props.comments.map(function(comment)
+         {
+           return (<Comment author = {comment.author} msg = {comment.msg} />);
+         });
+       return (
+               <div>
+                {comment}
+               </div>
+               );
+    }
+    });
+
+    var Comment = React.createClass({
+      render : function(){
+        return (
+                 <div>
+                  <span> Name : </span> {this.props.author}
+                  <span> Msg : </span> {this.props.msg}
+                 </div>
+          );
+      }
+    });
+
+    ReactDOM.render(<CommentControl /> , document.getElementById('content'));
+
+  </script>
+</body>
+</html>

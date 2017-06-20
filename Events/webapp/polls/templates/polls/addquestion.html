@@ -1,0 +1,67 @@
+<!-- 
+<h1> Add the questions and the choices here </h1>
+
+<form action = "/polls/addquestion/" method = "post">
+{% csrf_token %}
+Question : <input type = "text" name = "question" placeholder = "Enter the question"><br/>
+Choice 1 : <input type = "text" name = "choice1" placeholder = "Enter 1st choice"><br/>
+Choice 2 : <input type = "text" name = "choice2" placeholder = "Enter 2nd choice"><br/>
+Choice 3 : <input type = "text" name = "choice3" placeholder = "Enter 3rd choice"><br/>
+Choice 4 : <input type = "text" name = "choice4" placeholder = "Enter 4th choice"><br/>
+Choice 5 : <input type = "text" name = "choice5" placeholder = "Enter 5th choice"><br/>
+<input type = "submit" name = "submit" value = "submit">
+
+</form>
+
+-->
+
+<html>
+<head>
+   <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+   <!--<link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/> -->
+   <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+   <!--<script type="text/javascript" src="js/materialize.min.js"></script> -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+</head>
+
+<body>
+	<h1> Add Questions and Choices </h1><br />
+	<div class = "row">
+		<div class = "col s4">
+			<form action = "{% url 'polls:addquestion' %}" method = "post">
+				{% csrf_token %}
+				{{ form.non_field_errors }}
+				<div class = "input-field row">
+					{{ form.question.errors }}
+					<input placeholder="Question" id="question" type="text" class="validate" name = "question">
+                    <label for="first_name">Question</label>
+                </div>
+                <div class = "input-field row">
+                	{{ form.Choice1.errors }}
+                	<input placeholder = "Choice 1" id ="Choice1" type = "text" class = "validate" name = "choice1">
+                	<label for ="Choice1">Choice 1 </label>
+                </div>
+                <div class = "input-field row">
+                	<input placeholder = "Choice 2" id ="Choice2" type = "text" class = "validate" name = "choice2">
+                	<label for ="Choice2">Choice 2</label>
+                </div>
+                <div class = "input-field row">
+                	<input placeholder = "Choice 3" id ="Choice3" type = "text" class = "validate" name = "choice3">
+                	<label for ="Choice3">Choice 3 </label>
+                </div>
+                <div class = "input-field row">
+                	<input placeholder = "Choice 4" id ="Choice4" type = "text" class = "validate" name = "choice4">
+                	<label for ="Choice4">Choice 4 </label>
+                </div>
+                <div class = "input-field row">
+                	<input placeholder = "Choice 5" id ="Choice5" type = "text" class = "validate" name = "choice5">
+                	<label for ="Choice5">Choice 5 </label>
+                </div>
+                <button class="btn waves-effect red col s12" type="submit" name="submit">Submit
+                </button>
+            </form>
+        </div>
+    </div>    
+</body>
+</html>

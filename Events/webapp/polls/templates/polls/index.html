@@ -1,0 +1,15 @@
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
+{% if my_questions %}
+    <ul>
+    {% for questions in my_questions %}
+        <!--<li><a href="/polls/{{ questions.id }}/">{{ questions.question_text }}</a></li>-->
+        <li><a href="{% url 'polls:detail' questions.id %}">{{ questions.question_text }}</a></li>
+    {% endfor %}
+    </ul>
+    
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+<a href="{% url 'polls:logoutid' %}"> Logout </a><br />
+<a href = "addquestion/"> Add a Question </a>
